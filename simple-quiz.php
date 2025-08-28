@@ -44,3 +44,13 @@ function simple_quiz_uninstall() {
     $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}quizzes");
 }
 register_uninstall_hook(__FILE__, 'simple_quiz_uninstall');
+
+
+//Admin Menu
+add_action('admin_menu', function(){
+    add_menu_page("Simple Quiz", "Simple Quiz", "manage_options", "simple-quiz", "quiz_admin_page");
+});
+
+function quiz_admin_page(){
+    echo "<div class='wrap'><h2>Simple Quiz Admin</h2><p>Manage your quizzes here.</p></div>";
+}
