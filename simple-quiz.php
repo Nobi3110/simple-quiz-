@@ -54,3 +54,36 @@ add_action('admin_menu', function(){
 function quiz_admin_page(){
     echo "<div class='wrap'><h2>Simple Quiz Admin</h2><p>Manage your quizzes here.</p></div>";
 }
+
+
+function quiz_admin_page(){
+    global $wpdb;
+    $quiz_table = $wpdb->prefix."quizzes";
+
+    // Add new quiz
+    if(isset($_POST['new_quiz']) && !empty($_POST['quiz_title'])){
+        $wpdb->insert($quiz_table, [
+            'title'=>sanitize_text_field($_POST['quiz_title'])
+        ]);
+        echo "<div class='updated notice'><p>New quiz added!</p></div>";
+    }
+
+    // Get quizzes
+    $quizzes = $wpdb->get_results("SELECT * FROM $quiz_table");
+
+    echo "<div class='wrap'>
+        <h2>Manage Quizzes</h2>
+        <form method='post'>
+            <input name='quiz_title' placeholder='Quiz Title' required>
+            <button class='button button-primary' name='new_quiz'>Add Quiz</button>
+        </form><hr>";
+
+    if($quizzes){
+        echo "<h3>Existing Quizzes</h3><ul>";
+        foreach($quizzes as $quiz){
+            echo "<li>{$quiz->title}</li>";
+        }
+        echo "</ul>";
+    }
+    echo "</div>";
+}
