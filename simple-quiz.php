@@ -122,3 +122,43 @@ function quiz_admin_page(){
             <button class='button button-primary' name='new_question'>Add Question</button>
         </form><hr>";
     }
+
+
+    //FRONTEND shortcode 
+add_shortcode('simple_quiz', function($atts){
+    global $wpdb;
+    $atts = shortcode_atts(['id' => 0], $atts);
+    $quiz_id = intval($atts['id']);
+    if(!$quiz_id) return "<p>No quiz selected.</p>";
+
+    $quiz_table = $wpdb->prefix."quizzes";
+    $question_table = $wpdb->prefix."quiz_questions";
+
+    $quiz = $wpdb->get_row($wpdb->prepare("SELECT * FROM $quiz_table WHERE id=%d", $quiz_id));
+    if(!$quiz) return "<p>Quiz not found.</p>";
+
+    $questions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $question_table WHERE quiz_id=%d", $quiz_id));
+    if(!$questions) return "<p>No questions in this quiz.</p>";
+
+    ob_start();
+    ?>
+    <div class="simple-quiz-container">
+        <h3><?php echo esc_html($quiz->title); ?></h3>
+        <form method="post">
+        <?php foreach($questions as $q): ?>
+            <div class="simple-quiz-question">
+                <b><?php echo esc_html($q->question); ?></b><br>
+                <?php for($i=1;$i<=4;$i++): ?>
+                    <label>
+                        <input type="radio" name="q<?php echo $q->id; ?>" value="<?php echo $i; ?>">
+                        <?php echo esc_html($q->{"option$i"}); ?>
+                    </label><br>
+                <?php endfor; ?>
+            </div>
+        <?php endforeach; ?>
+        <button name="submit_quiz">Submit Quiz</button>
+        </form>
+    </div>
+    <?php
+    return ob_get_clean();
+});
