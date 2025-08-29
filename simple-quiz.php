@@ -87,3 +87,38 @@ function quiz_admin_page(){
     }
     echo "</div>";
 }
+
+
+// Add new question
+    $question_table = $wpdb->prefix."quiz_questions";
+    if(isset($_POST['new_question']) && !empty($_POST['question']) && !empty($_POST['quiz_id'])){
+        $wpdb->insert($question_table, [
+            'quiz_id'=>intval($_POST['quiz_id']),
+            'question'=>sanitize_text_field($_POST['question']),
+            'option1'=>sanitize_text_field($_POST['option1']),
+            'option2'=>sanitize_text_field($_POST['option2']),
+            'option3'=>sanitize_text_field($_POST['option3']),
+            'option4'=>sanitize_text_field($_POST['option4']),
+            'correct_option'=>intval($_POST['correct_option'])
+        ]);
+        echo "<div class='updated notice'><p>New question added!</p></div>";
+    }
+
+    // Show add question form
+    if($quizzes){
+        echo "<h3>Add Question</h3>
+        <form method='post'>
+            <select name='quiz_id' required>";
+        foreach($quizzes as $quiz){
+            echo "<option value='{$quiz->id}'>{$quiz->title}</option>";
+        }
+        echo "</select><br>
+            <input name='question' placeholder='Question'><br>
+            <input name='option1' placeholder='Option 1'><br>
+            <input name='option2' placeholder='Option 2'><br>
+            <input name='option3' placeholder='Option 3'><br>
+            <input name='option4' placeholder='Option 4'><br>
+            Correct (1-4): <input name='correct_option' type='number' min='1' max='4'><br>
+            <button class='button button-primary' name='new_question'>Add Question</button>
+        </form><hr>";
+    }
