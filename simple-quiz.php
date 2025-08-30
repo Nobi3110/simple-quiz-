@@ -162,3 +162,20 @@ add_shortcode('simple_quiz', function($atts){
     <?php
     return ob_get_clean();
 });
+
+    if(isset($_POST['submit_quiz'])){
+        $score = 0; $i=0;
+        foreach($questions as $q){
+            $i++;
+            if(isset($_POST["q{$q->id}"]) && $_POST["q{$q->id}"] == $q->correct_option){
+                $score++;
+            }
+        }
+        $user_id = get_current_user_id();
+        $wpdb->insert($wpdb->prefix."quiz_attempts", [
+            'user_id'=>$user_id,
+            'quiz_id'=>$quiz_id,
+            'score'=>$score
+        ]);
+        echo "<h3>Your Score: $score / $i</h3>";
+    }
